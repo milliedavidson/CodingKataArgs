@@ -1,5 +1,10 @@
 namespace CodingKataArgs;
 
+/// <summary>
+/// Parses command-line arguments based on a provided schema
+/// Supports boolean, integer, string, integer list and string list argument types
+/// Handles default values, type conversion and validation of argument format
+/// </summary>
 public class ArgsParser
 {
     private readonly Dictionary<char, ArgSchemaItem> _schemaItem;
@@ -13,6 +18,10 @@ public class ArgsParser
         SetDefaults();
     }
 
+    /// <summary>
+    /// Parses the schema string into a dictionary of flag definitions
+    /// Each entry defines a flag and its expected type
+    /// </summary>
     private Dictionary<char, ArgSchemaItem> ParseSchema(string schema)
     {
         var dictionary = new Dictionary<char, ArgSchemaItem>();
@@ -27,8 +36,10 @@ public class ArgsParser
             if (string.IsNullOrWhiteSpace(trimmed))
                 continue;
 
+            // Stores the position of the colon character
             var colonIndex = trimmed.IndexOf(':');
 
+            // Validate schema format: must be "flag:type"
             if (colonIndex == -1)
                 throw new ArgsException($"Invalid schema format: '{part}'. Expected 'flag:type'");
 
@@ -38,6 +49,7 @@ public class ArgsParser
             var flag = trimmed[0];
             var typeStr = trimmed.Substring(2).ToLower();
 
+            // Map type string to ArgType enum
             var type = typeStr switch
             {
                 "bool" => ArgType.Bool,
@@ -57,6 +69,10 @@ public class ArgsParser
         return dictionary;
     }
 
+    /// <summary>
+    /// Parses the command-line arguments into a dictionary of flag values
+    /// Validates argument format and type
+    /// </summary>
     private Dictionary<char, object> ParseArgs(string[] args)
     {
         var values = new Dictionary<char, object>();
@@ -99,6 +115,10 @@ public class ArgsParser
         return values;
     }
 
+    /// <summary>
+    /// Converts a string value to the appropriate type for a flag
+    /// Handles int, string, int list and string list types
+    /// </summary>
     private object ParseValue(char flag, string valueStr, ArgType type)
     {
         try
@@ -122,6 +142,9 @@ public class ArgsParser
         }
     }
 
+    /// <summary>
+    /// Sets default values for any flags defined in the schema but not present in the arguments
+    /// </summary>
     private void SetDefaults()
     {
         foreach (var schemaItem in _schemaItem.Values)
@@ -141,6 +164,10 @@ public class ArgsParser
         }
     }
 
+    /// <summary>
+    /// Retrieves the value for a flag, cast to the specified type
+    /// Throws if the flag is not defined in the schema
+    /// </summary>
     private T Get<T>(char flag)
     {
         if (!_schemaItem.ContainsKey(flag))
