@@ -7,7 +7,10 @@ namespace CodingKataArgs;
 /// </summary>
 public class ArgsParser
 {
+    // Maps flag characters to their schema definitions
     private readonly Dictionary<char, ArgSchemaItem> _schemaItem;
+
+    // Stores the parsed values for each flag
     private readonly Dictionary<char, object> _values;
 
     public ArgsParser(string schema, string[] args)
